@@ -2,6 +2,7 @@ package com.threecats.user;
 
 import com.threecats.command.Command;
 import com.threecats.command.deposit.DepositCommand;
+import com.threecats.command.withdraw.WithdrawCommand;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoMap;
@@ -14,5 +15,10 @@ public interface UserCommandModule {
     @IntoMap
     @StringKey("deposit")
     Command depositCommand(DepositCommand command);
+
+    @Binds
+    @IntoMap
+    @StringKey("withdraw")
+    Command withdrawCommand(WithdrawCommand command);
 
 }
