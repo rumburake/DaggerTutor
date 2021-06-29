@@ -1,6 +1,7 @@
 package com.threecats.command.withdraw;
 
 import com.threecats.command.BigDecimalCommand;
+import com.threecats.command.limiter.WithdrawLimiter;
 import com.threecats.config.MaxTransaction;
 import com.threecats.config.MinBalance;
 import com.threecats.db.Database;
@@ -13,6 +14,7 @@ public class WithdrawCommand extends BigDecimalCommand {
 
     Database.Account account;
     Outputter outputter;
+    WithdrawLimiter withdrawLimiter;
     BigDecimal minBalance;
     BigDecimal maxTransaction;
 
@@ -20,6 +22,7 @@ public class WithdrawCommand extends BigDecimalCommand {
     public WithdrawCommand(
             Database.Account account,
             Outputter outputter,
+            WithdrawLimiter withdrawLimiter,
             @MinBalance BigDecimal minBalance,
             @MaxTransaction BigDecimal maxTransaction
     ) {
@@ -27,6 +30,7 @@ public class WithdrawCommand extends BigDecimalCommand {
         System.out.println("Creating a new " + this);
         this.account = account;
         this.outputter = outputter;
+        this.withdrawLimiter = withdrawLimiter;
         this.minBalance = minBalance;
         this.maxTransaction = maxTransaction;
     }
@@ -37,8 +41,9 @@ public class WithdrawCommand extends BigDecimalCommand {
             outputter.output("Transaction too large!");
         } else if (account.balance().subtract(amount).compareTo(minBalance) < 0) {
             outputter.output("Not enough cash!");
-        } else {
+        } else if (withdrawLimiter.canWithdraw(amount)) {
             account.withdraw(amount);
+            withdrawLimiter.recWithdraw(amount);
             outputter.output("New Balance: " + account.balance());
         }
     }

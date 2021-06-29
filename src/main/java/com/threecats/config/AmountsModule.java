@@ -19,4 +19,10 @@ public interface AmountsModule {
     static BigDecimal minBalance() {
         return new BigDecimal(1);
     }
+
+    @Provides
+    @MaxSession
+    static BigDecimal maxSession() {
+        return new BigDecimal(5);
+    }
 }
